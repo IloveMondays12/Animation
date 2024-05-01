@@ -4,14 +4,21 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Animation
 {
+    enum Screen
+    {
+        Intro,
+        MainAnimation
+    }
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        Texture2D greyTribble;
+        Texture2D greyTribble, backgroundIntroTexture;
         Rectangle window;
         Rectangle greyTribbleRect;
         Vector2 greyTribbleSpeed;
+        MouseState mouseState;
+        Screen screen;
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -21,6 +28,7 @@ namespace Animation
 
         protected override void Initialize()
         {
+           screen = Screen.Intro;
             // TODO: Add your initialization logic here
             window = new Rectangle(0, 0, 800,600);
             _graphics.PreferredBackBufferWidth = window.Width;
@@ -35,15 +43,24 @@ namespace Animation
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             greyTribble = Content.Load<Texture2D>("tribbleGrey");
+            backgroundIntroTexture = Content.Load<Texture2D>("Untitled");
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
+            mouseState = Mouse.GetState();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            // TODO: Add your update logic here
+            if (screen == Screen.Intro)
+            {
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    screen = Screen.MainAnimation;
+                }
+            }
+            if (screen == Screen.MainAnimation)
+            {
             greyTribbleRect.X += (int)greyTribbleSpeed.X;
             greyTribbleRect.Y += (int)greyTribbleSpeed.Y;
             base.Update(gameTime);
@@ -55,6 +72,9 @@ namespace Animation
             {
                 greyTribbleSpeed.Y = greyTribbleSpeed.Y * -1;
             }
+            }
+            // TODO: Add your update logic here
+            
         }
 
         protected override void Draw(GameTime gameTime)
@@ -63,7 +83,15 @@ namespace Animation
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
+            if(screen == Screen.Intro)
+            {
+                _spriteBatch.Draw(backgroundIntroTexture, window, Color.White);
+            }
+            if (screen == Screen.MainAnimation)
+            {
             _spriteBatch.Draw(greyTribble, greyTribbleRect, Color.White);
+            }
+            
             _spriteBatch.End();
             base.Draw(gameTime);
         }
